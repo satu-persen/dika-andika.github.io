@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBCQ0wAAtqKxMSC4z_vHyuotp8bBxFcmJQ",
   authDomain: "gs://satu-216d6.appspot.com",
   projectId: "satu-216d6",
-  storageBucket: "YOUR_STORAGE_BUCKET",
+  storageBucket: "satu-216d6.appspot.com",
   messagingSenderId: "825499597905",
   appId: "YOUR_APP_ID"
 };
