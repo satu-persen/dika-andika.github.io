@@ -1,7 +1,7 @@
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBCQ0wAAtqKxMSC4z_vHyuotp8bBxFcmJQ",
-  authDomain: "gs://satu-216d6.appspot.com",
+  authDomain: "satu-216d6.firebaseapp.com",
   projectId: "satu-216d6",
   storageBucket: "satu-216d6.appspot.com",
   messagingSenderId: "825499597905",
