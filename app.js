@@ -5,7 +5,7 @@ const firebaseConfig = {
   projectId: "satu-216d6",
   storageBucket: "satu-216d6.appspot.com",
   messagingSenderId: "825499597905",
-  appId: "YOUR_APP_ID"
+  appId: "1:825499597905:web:a16d465797540966128c70"
 };
 
 // Initialize Firebase
