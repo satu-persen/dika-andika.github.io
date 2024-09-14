@@ -2,7 +2,8 @@
 const firebaseConfig = {
   apiKey: "AIzaSyBCQ0wAAtqKxMSC4z_vHyuotp8bBxFcmJQ",
   authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
+  projectId: "
+satu-216d6",
   storageBucket: "YOUR_STORAGE_BUCKET",
   messagingSenderId: "825499597905",
   appId: "YOUR_APP_ID"
