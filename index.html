@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat & DALL-E Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #response, #imageResponse {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        img {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .code {
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap; /* Mempertahankan format teks */
+            overflow-x: auto; /* Menambahkan scrollbar horizontal jika perlu */
+        }
+    </style>
+</head>
+<body>
+       <marquee behavior="alternate" scrollamount="4">
+        - AI Teks & AI DALLE Website dibuat oleh Dika dibantu oleh ChatGPT - OpenAI dan <a href="https://widipe.com" target="_blank">widipe.com</a> -
+    </marquee>
+
+    <div id="textAI">
+        <h2>Interaksi dengan AI (Teks)</h2>
+        <textarea id="textPrompt" placeholder="Masukkan prompt Anda di sini..."></textarea>
+        <button id="textSubmit">Kirim Teks</button>
+        <div id="response"></div>
+        <button id="speakResponse" class="hidden">🗣️🎙️</button> <!-- Tombol untuk membaca teks -->
+    </div>
+
+    <div id="imageAI" class="hidden">
+        <h2>Generasi Gambar dengan DALL-E</h2>
+        <textarea id="imagePrompt" placeholder="Masukkan deskripsi gambar di sini..."></textarea>
+        <button id="imageSubmit">Kirim Gambar</button>
+        <div id="imageResponse"></div>
+        <img id="image" src="" alt="Generated Image" style="display:none;"/>
+        <button id="downloadImage" class="hidden">Unduh Gambar</button> <!-- Tombol untuk mengunduh gambar -->
+    </div>
+
+    <button id="toggleAI">Ganti ke DALL-E</button>
+
+    <script>
+        let lastResponseText = ""; // Variabel untuk menyimpan teks terakhir yang diterima
+
+        // Fungsi untuk mengirim prompt teks ke API OpenAI
+        document.getElementById('textSubmit').addEventListener('click', function() {
+            const prompt = document.getElementById('textPrompt').value;
+            const url = `https://widipe.com/openai?text=${encodeURIComponent(prompt)}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Jaringan tidak stabil atau kesalahan pada API');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status) {
+                    lastResponseText = data.result; // Simpan hasil terakhir
+                    document.getElementById('response').innerHTML = formatResponse(lastResponseText);
+                    document.getElementById('speakResponse').classList.remove('hidden'); // Tampilkan tombol baca
+                } else {
+                    document.getElementById('response').innerText = 'Terjadi kesalahan: ' + (data.message || 'Tidak ada detail');
+                }
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+                document.getElementById('response').innerText = 'Terjadi kesalahan saat menghubungi API.';
+            });
+        });
+
+        // Fungsi untuk mengirim deskripsi gambar ke API DALL-E
+        document.getElementById('imageSubmit').addEventListener('click', function() {
+            const prompt = document.getElementById('imagePrompt').value;
+            const url = `https://widipe.com/dalle?text=${encodeURIComponent(prompt)}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'accept': 'image/jpeg'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Jaringan tidak stabil atau kesalahan pada API');
+                }
+                return response.blob(); // Mengambil respons sebagai blob
+            })
+            .then(imageBlob => {
+                const imageObjectURL = URL.createObjectURL(imageBlob);
+                const img = document.getElementById('image');
+                img.src = imageObjectURL;
+                img.style.display = 'block'; // Menampilkan gambar
+                document.getElementById('imageResponse').innerText = 'Gambar telah dihasilkan!';
+                document.getElementById('downloadImage').classList.remove('hidden'); // Tampilkan tombol unduh
+            })
+            .catch(error => {
+                console.error('Terjadi kesalahan:', error);
+                document.getElementById('imageResponse').innerText = 'Terjadi kesalahan saat menghubungi API.';
+            });
+        });
+
+        // Fungsi untuk mengganti antara antarmuka Teks dan Gambar
+        document.getElementById('toggleAI').addEventListener('click', function() {
+            const textAI = document.getElementById('textAI');
+            const imageAI = document.getElementById('imageAI');
+
+            if (textAI.classList.contains('hidden')) {
+                textAI.classList.remove('hidden');
+                imageAI.classList.add('hidden');
+                document.getElementById('toggleAI').innerText = 'Ganti ke DALL-E';
+            } else {
+                textAI.classList.add('hidden');
+                imageAI.classList.remove('hidden');
+                document.getElementById('toggleAI').innerText = 'Ganti ke AI Teks';
+            }
+        });
+
+        // Format respons untuk menyajikan teks dalam gaya yang dapat disalin
+        function formatResponse(text) {
+            // Mengganti simbol khusus dengan format yang lebih baik
+            return text.replace(/```([^`]+)```/g, '<pre class="code">$1</pre>') // Mengganti triple backtick
+                       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                       .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                       .replace(/\/(.+?)\//g, '<i>$1</i>')
+                       .replace(/~/g, '<span style="text-decoration: line-through;">~</span>');
+        }
+
+        // Membaca teks yang dikirim oleh AI
+        document.getElementById('speakResponse').addEventListener('click', function() {
+            const speech = new SpeechSynthesisUtterance(lastResponseText);
+            speech.lang = 'id-ID'; // Mengatur bahasa ke Bahasa Indonesia
+            window.speechSynthesis.speak(speech);
+        });
+
+        // Fungsi untuk mengunduh gambar
+        document.getElementById('downloadImage').addEventListener('click', function() {
+            const img = document.getElementById('image');
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'generated-image.png'; // Nama file untuk gambar yang diunduh
+            link.click();
+        });
+    </script>
+</body>
+</html>
